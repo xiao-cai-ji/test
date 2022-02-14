@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+
+<mapper namespace="com.inspur.cmis.client.mapper.CertificateDao">
+<!-- 分页查询 -->
+	<select id="getcertListBypage" parameterType="certificate" resultType="certificate">
+	select * from gzcrm_certificate where 1=1 
+	<if test="cm_id!=null and cm_id!=''">
+		and cm_id=#{cm_id}
+	</if>
+	
+	<if test="cm_year!=null and cm_year!=''">
+		and cm_year=#{cm_year}
+	</if>
+	
+	
+   	<if test="pageNo!=null and pageSize!=null">
+   		limit #{pageNo},#{pageSize}
+   	</if>
+   	
+   	
+   </select>
+   
+   <select id="selectCertLidtCount" resultType="java.lang.Integer">
+	select count(*) from gzcrm_certificate 
+  </select>
+   
+   <select id="fingClientname" resultType="certificate">
+   	select * from gzcrm_cminfo
+   </select>
+   
+   
+   
+   
+   <!-- 添加 -->
+   <insert id="add" parameterType="certificate" >
+   		insert into gzcrm_certificate(cm_id,cm_certificate_name,cm_certificate_type,cm_certificate_no,cm_certificate_unit,cm_start_date,cm_end_date,cm_remark,cm_modification_date,cm_period,cm_modification_person,cm_year)
+   		
+   		values(#{cm_id},#{cm_certificate_name},#{cm_certificate_type},#{cm_certificate_no},#{cm_certificate_unit},#{cm_start_date},#{cm_end_date},#{cm_remark},#{cm_modification_date},#{cm_period},#{cm_modification_person},#{cm_year})
+   	
+   </insert>
+   
+   
+ 
+   <select id="findtype" resultType="certificate"> 
+   select * from certificate_type
+   
+   </select>
+   
+   
+   
+   <!-- 添加成功后查询发证时间最大的记录 -->
+<select id="selectNew"  parameterType="certificate" resultType="certificate">
+select 
+	cm_id,
+	max(cm_start_date) as cm_start_date,
+	cm_certificate_no,
+	cm_certificate_name,
+	cm_certificate_type,
+	cm_period
+	from gzcrm_certificate where 
+	cm_id=#{cm_id} and cm_certificate_type=#{cm_certificate_type} and cm_period=1 and
+	cm_start_date=
+	(
+		select max(cm_start_date) from gzcrm_certificate  where
+		cm_id=#{cm_id} and cm_certificate_type=#{cm_certificate_type} and cm_period=1
+	)
+
+</select>
+ <!-- 更新客户经理信息表 -->
+<update id="updateCmInfo" parameterType="client">
+		UPDATE  gzcrm_cminfo 
+		
+		<set>
+		<!-- 从业资格证书 -->
+		<if test=" cm_certificate_type==0 and  cm_certificate_type!=null">
+			 cm_certificate_number = #{cm_certificate_number},
+			 cm_certificate_date= #{cm_certificate_date},
+			 cm_certificate_period = #{cm_certificate_period},
+		</if>
+		<!-- 等级资格证书 -->
+		<if test=" cm_certificate_type==2 and  cm_certificate_type!=null">
+			 cm_level_number= #{cm_level_number},
+			 cm_level_date  = #{cm_level_date },
+			 cm_level_period = #{cm_level_period},
+		</if>
+		<!-- 岗位证书 -->
+		<if test=" cm_certificate_type==1 and  cm_certificate_type!=null">
+			 cm_status_number = #{ cm_status_number},
+			 cm_status_number_date  = #{cm_status_number_date},
+			 cm_status_number_period= #{cm_status_number_period},
+		</if>
+
+		</set>
+			where cm_id=#{cm_id}
+
+</update>
+
+
+
+   <!--修改 -->
+   <select id="selectCertificate" parameterType="int"  resultType="certificate">
+    select * from gzcrm_certificate where cm_key=#{cm_key}
+   </select>
+   
+
+	<update id="update" parameterType="certificate">
+	<!-- 	UPDATE gzcrm_certificate SET
+			cm_certificate_name=#{cm_certificate_name},
+			cm_certificate_type=#{cm_certificate_type},
+			cm_certificate_no=#{cm_certificate_no},
+			cm_certificate_unit=#{cm_certificate_unit},
+			cm_start_date=#{cm_start_date},
+			cm_end_date=#{cm_end_date},
+			cm_remark=#{cm_remark},
+			cm_period=#{cm_period},
+			cm_certificate_url=#{cm_certificate_url},
+			cm_modification_date=#{cm_modification_date},
+			cm_modification_person=#{cm_modification_person},
+			cm_modification_date=#{cm_modification_date},
+			cm_certificate_url=#{cm_certificate_url}
+			WHERE cm_key=#{cm_key} -->
+			
+			update  gzcrm_certificate 
+		<set>
+		<if test="cm_certificate_name!=null and cm_certificate_name!=''">
+			cm_certificate_name=#{cm_certificate_name},
+		</if>
+		<if test="cm_certificate_type!=null and cm_certificate_type!=''">
+			cm_certificate_type=#{cm_certificate_type},
+		</if>
+		<if test="cm_certificate_no!=null and cm_certificate_no!=''">
+			cm_certificate_no=#{cm_certificate_no},
+		</if>
+		<if test="cm_certificate_unit!=null and cm_certificate_unit!=''">
+			cm_certificate_unit=#{cm_certificate_unit},
+		</if>
+		<if test="cm_start_date!=null and cm_start_date!=''">
+			cm_start_date=#{cm_start_date},
+		</if>
+		<if test="cm_end_date!=null and cm_end_date!=''">
+			cm_end_date=#{cm_end_date},
+		</if>
+		<if test="cm_remark!=null and cm_remark!=''">
+			cm_remark=#{cm_remark},
+		</if>
+		<if test="cm_certificate_url!=null and cm_certificate_url!=''">
+			cm_certificate_url=#{cm_certificate_url},
+		</if>
+		<if test="cm_modification_date!=null and cm_modification_date!=''">
+			cm_modification_date=#{cm_modification_date},
+		</if>
+		<if test="cm_modification_person!=null and cm_modification_person!=''">
+			cm_modification_person=#{cm_modification_person},
+		</if>
+		
+		<if test="cm_modification_date!=null and cm_modification_date!=''">
+			cm_modification_date=#{cm_modification_date},
+		</if>
+			cm_period=#{cm_period}
+		</set>
+		WHERE cm_key=#{cm_key}
+			
+	</update>
+
+
+
+	
+	 <!-- 删除 -->
+	 
+	 <!-- 先查询 -->
+<select id="selectType" parameterType="certificate" resultType="certificate">
+	select cm_id,cm_certificate_type, cm_certificate_no from gzcrm_certificate
+	where cm_key in
+	<foreach collection="array" item="cm_key" open="(" separator=","  close=")" index="i" >
+		#{cm_key}
+	</foreach>
+</select>
+	 
+   <delete id="delete">
+	delete from gzcrm_certificate where cm_key in
+	<foreach collection="array" item="cm_key" open="(" separator=","  close=")" index="i" >
+		#{cm_key}
+	</foreach>
+   </delete>
+   
+   
+   <!-- h获取所有的客户经理编号 -->
+   <select id="finAll" resultType="Integer">
+   		select cm_id from gzcrm_cminfo
+   </select>
+   
+   
+
+   
+   
+
+
+   
+
+</mapper>

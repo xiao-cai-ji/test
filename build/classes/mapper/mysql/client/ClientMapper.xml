@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.inspur.cmis.client.mapper.ClientDao">
+	
+	<select id="getClientListBypage" parameterType="client" resultType="client">
+	select * from gzcrm_cminfo where 1=1 
+	<if test="cm_unit!=null and cm_unit!=''">
+		and cm_unit like  concat(concat("%",#{ cm_unit }),"%")
+	</if>
+	<if test="cm_id!=null and cm_id!=''">
+		and cm_id=#{cm_id}
+	</if>
+	<if test="cm_name!=null and cm_name!=''">
+		and cm_name  like concat(concat("%",#{ cm_name}),"%")
+	</if>
+	<if test="cm_status!=null and cm_status!=''">
+		and cm_status=#{cm_status}
+	</if>
+	<!-- 分页查询 -->
+   	<if test="pageNo!=null and pageSize!=null">
+   		limit #{pageNo},#{pageSize}
+   	</if>
+   </select>
+   
+   <!-- 查询总记录数 -->
+<select id="selectClientLidtCount" resultType="java.lang.Integer">
+	select count(*) from gzcrm_cminfo 
+</select>
+	<!-- 民族 -->
+	<select id="getNationList" resultType="Nation">
+    	SELECT * FROM gzcrm_nation
+    </select>
+    
+    	<!-- 根据ID查询 -->
+    <select id="selectClient" parameterType="int" resultType="client">
+    	SELECT * FROM gzcrm_cminfo WHERE cm_id=#{cm_id}
+    </select>
+    <!-- 更新 -->
+    
+    
+    <update id="updateClient" parameterType="client">
+		
+		UPDATE  gzcrm_cminfo SET cm_name=#{cm_name},cm_sex=#{cm_sex},cm_ssn=#{cm_ssn},cm_birthday=#{cm_birthday},
+		cm_age=#{cm_age},cm_nation=#{cm_nation},cm_political_landscape=#{cm_political_landscape},cm_hometown=#{cm_hometown},
+		cm_photo=#{cm_photo},cm_education=#{cm_education},cm_degree=#{cm_degree},cm_graduated=#{cm_graduated},
+		cm_professional_titles=#{cm_professional_titles},cm_level=#{cm_level},cm_unit=#{cm_unit},cm_dept=#{cm_dept},cm_position=#{cm_position},
+		cm_hiredate=#{cm_hiredate},cm_entry_time=#{cm_entry_time},cm_financial_years=#{cm_financial_years},cm_working_years=#{cm_working_years},
+		cm_exit_time=#{cm_exit_time},cm_tel=#{cm_tel},cm_mobile=#{cm_mobile}
+		WHERE cm_id=#{cm_id}
+		
+	</update>
+	<!-- 添加 -->
+    <insert id="add" parameterType="Client">
+		insert into gzcrm_cminfo(cm_id,cm_name,cm_sex,cm_ssn,cm_birthday,cm_age,cm_nation,cm_political_landscape,
+								cm_hometown,cm_photo,cm_education,cm_degree,cm_graduated,cm_professional_titles,
+        						cm_level,cm_unit,cm_dept,cm_position,cm_hiredate,cm_entry_time,cm_financial_years,
+       	 						cm_working_years,cm_exit_time,cm_tel,cm_mobile)
+		values(#{cm_id},#{cm_name},#{cm_sex},#{cm_ssn},#{cm_birthday},#{cm_age},#{cm_nation},#{cm_political_landscape},
+			   #{cm_hometown},#{cm_photo},#{cm_education},#{cm_degree},#{cm_graduated},#{cm_professional_titles},
+			   #{cm_level},#{cm_unit},#{cm_dept},#{cm_position},#{cm_hiredate},#{cm_entry_time},#{cm_financial_years},
+			   #{cm_working_years},#{cm_exit_time},#{cm_tel},#{cm_mobile})
+ 
+	</insert>
+	
+		<!-- 删除 -->
+	<delete id="deleteClient" >
+		delete from gzcrm_cminfo where cm_id in
+		<foreach collection="array" item="cm_id" open="(" separator="," close=")">
+			#{cm_id}
+		</foreach>
+	</delete>
+	
+	<select id="selectDetail" parameterType="int" resultType="client">
+		select * from gzcrm_cminfo
+		
+	</select>
+	
+	
+	 <!-- h获取所有的客户经理编号 -->
+   <select id="finAll" resultType="Integer">
+   		select cm_id from gzcrm_cminfo
+   </select>
+   
+	
+
+
+
+</mapper>

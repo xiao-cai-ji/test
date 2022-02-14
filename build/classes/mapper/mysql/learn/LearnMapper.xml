@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.inspur.cmis.learn.mapper.LearnDao">
+
+	<select id="getAllLearns" resultType="learn1">
+		select * from gzcrm_learn
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteLearn" >
+		delete from gzcrm_learn where l_key in
+		<foreach collection="array" item="l_key" open="(" separator="," close=")">
+			#{l_key}
+		</foreach>
+	</delete>
+	<!--查询 -->
+	<select id="getLearnListBypage" parameterType="learn1" resultType="learn1">
+		select l_key,l_name,l_type,l_des,l_date,l_uper,l_url,lt_name from gzcrm_learn,learn_type
+		where gzcrm_learn.l_type=learn_type.LT_ID
+		<if test="l_name!=null and l_name!=''">
+			and l_name like "%"#{l_name}"%"
+		</if>
+		<if test="l_type!=null and l_type!=''">
+			and l_type=#{l_type}
+		</if>
+		order by l_key desc
+		<if test="pageNo!=null and pageSize!=null">
+			limit #{pageNo},#{pageSize}
+		</if>
+	</select>
+	<select id="findLearnType" resultType="learn1" >
+		select * from learn_type
+	</select>
+	
+	<select id="selectLearnLidtCount"  resultType="Integer"> 
+		select count(*) from gzcrm_learn
+	</select>
+	<!-- 修改-->
+	 <select id="updateById" parameterType="java.lang.Integer" resultType="learn1">
+    	select * from gzcrm_learn where l_key=#{id}
+    </select>
+    
+    <update id="updateLearn" parameterType="learn1" >
+    	update gzcrm_learn set l_name=#{l_name},l_type=#{l_type},l_des=#{l_des} ,l_url=#{l_url} where l_key=#{l_key}
+    </update>
+    <!-- 添加 -->
+     <insert id="add" parameterType="learn1">
+		insert into gzcrm_learn(l_name,ispublic,l_type,l_des,l_date,l_url,l_uper)
+		values(#{l_name},#{ispublic},#{l_type},#{l_des},#{l_date},#{l_url},#{l_uper})
+	</insert>
+
+</mapper>

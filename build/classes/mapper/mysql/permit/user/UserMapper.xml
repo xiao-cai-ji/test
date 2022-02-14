@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.inspur.cmis.permit.user.mapper.UserDao">
+	
+	<!-- 查询全部 -->
+	<select id="getAllUsers" resultType="user">
+		select men_id,cname,isenable,register_time,last_time from yc_member
+	</select>
+	<!--插入  -->
+	<insert id="add" parameterType="user">
+			insert into yc_member(cname,men_sex,men_born,roleid,register_time,last_time)
+		values(#{cname},#{men_sex},#{men_born},#{roleid},#{register_time},#{last_time})
+	</insert>
+	
+	<!-- 根据id修改个人信息 -->
+	 <select id="updateById" parameterType="java.lang.Integer" resultType="user">
+    	select * from yc_member where men_id=#{id}
+    </select>
+    
+     <update id="updateUser" parameterType="user" >
+    	update yc_member set cname=#{cname},men_sex=#{men_sex},men_born=#{men_born},roleid=#{roleid} where men_id=#{men_id}
+    </update>
+    
+	<!-- 查询一个 -->
+	<select id="getUserListByPage" parameterType="user" resultType="user">
+		select men_id,cname,isenable,register_time,last_time from yc_member where 1=1 order by men_id desc
+		<if test="cname!=null and cname!=''">
+		 and cname=#{cname} 
+		</if>
+		<if test="men_id!=null and men_id!=''">
+		 and men_id=#{men_id}	
+		</if>
+		<if test="pageNo!=null and pageSize!=null">
+			limit #{pageNo},#{pageSize}
+		</if>
+	</select>
+	<!-- 查询客户总数 -->
+	<select id="selectUserListCount"  resultType="Integer"> 
+		select count(*) from yc_member
+	</select>
+	
+	<!-- 删除一个 -->
+	<delete id="deleteUser" >
+		delete from yc_member where men_id=#{men_id}
+	</delete>
+	<!-- 启用用户 -->
+	<update id="openUser">
+		UPDATE  yc_member SET ISENABLE="正常" WHERE  men_id=#{men_id}
+	</update>
+	<!-- 禁用用户 -->
+	<update id="closeUser">
+		UPDATE  yc_member SET ISENABLE="禁用" WHERE  men_id=#{men_id}
+	</update>
+	<!-- 重置密码 -->
+	<update id="repassword">
+		update yc_member set men_pass="123456" where men_id=#{men_id}
+	</update>
+	
+
+</mapper>
